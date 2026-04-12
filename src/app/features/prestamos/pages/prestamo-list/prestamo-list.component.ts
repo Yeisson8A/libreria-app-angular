@@ -6,13 +6,13 @@ import { ConfirmDialogComponent } from '../../../../shared/components/confirm-di
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
+import { CardGridComponent } from '../../../../shared/components/card-grid/card-grid.component';
 
 @Component({
   selector: 'app-prestamo-list',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, CardGridComponent],
   templateUrl: './prestamo-list.component.html',
   styleUrl: './prestamo-list.component.scss',
 })
@@ -35,6 +35,21 @@ export class PrestamoListComponent implements OnInit {
 
   irCrear() {
     this.router.navigate(['/prestamos/nuevo']);
+  }
+
+  accionesPrestamo(prestamo: any) {
+    const actions = [];
+
+    if (!prestamo.fechaDevolucion) {
+      actions.push({
+        icon: 'assignment_return',
+        tooltip: 'Devolver',
+        color: 'primary',
+        action: (p: any) => this.devolver(p),
+      });
+    }
+
+    return actions;
   }
 
   devolver(prestamo: Prestamo) {

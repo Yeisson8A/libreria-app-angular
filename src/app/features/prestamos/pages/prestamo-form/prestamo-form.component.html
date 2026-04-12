@@ -3,58 +3,113 @@
     <mat-card-title> Nuevo Préstamo </mat-card-title>
     <br />
     <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="guardar()">
-        <div class="row">
-          <mat-form-field>
-            <mat-label>Libro</mat-label>
-            <mat-select formControlName="libroId">
-              <mat-option *ngFor="let libro of libros" [value]="libro.id">
-                {{ libro.titulo }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="form.get('libroId')?.hasError('required')">
-              El libro es obligatorio
-            </mat-error>
-            <mat-error *ngIf="form.get('libroId')?.hasError('backend')">
-              {{ form.get("libroId")?.getError("backend") }}
-            </mat-error>
-          </mat-form-field>
+      <div class="row">
+        <mat-horizontal-stepper linear>
+          <!-- PASO 1 -->
+          <mat-step [stepControl]="step1Form">
+            <form [formGroup]="step1Form">
+              <h3>Seleccionar Libro</h3>
 
-          <mat-form-field>
-            <mat-label>Usuario</mat-label>
-            <mat-select formControlName="usuarioId">
-              <mat-option *ngFor="let usuario of usuarios" [value]="usuario.id">
-                {{ usuario.nombre }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="form.get('usuarioId')?.hasError('required')">
-              El usuario es obligatorio
-            </mat-error>
-            <mat-error *ngIf="form.get('usuarioId')?.hasError('backend')">
-              {{ form.get("usuarioId")?.getError("backend") }}
-            </mat-error>
-          </mat-form-field>
-        </div>
-        <div class="actions">
-          <button
-            mat-raised-button
-            color="primary"
-            type="button"
-            (click)="volver()"
-          >
-            Volver
-          </button>
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar libro</mat-label>
+                <input
+                  matInput
+                  formControlName="busquedaLibro"
+                  placeholder="Título o ISBN"
+                />
+              </mat-form-field>
 
-          <button
-            mat-flat-button
-            color="primary"
-            type="submit"
-            [disabled]="form.invalid"
-          >
-            Prestar
-          </button>
-        </div>
-      </form>
+              <div class="list">
+                <div
+                  class="item"
+                  *ngFor="let libro of librosFiltrados"
+                  (click)="step1Form.patchValue({ libroId: libro.id })"
+                  [class.selected]="step1Form.value.libroId === libro.id"
+                >
+                  <div class="item-content">
+                    <div class="info">
+                      <div class="titulo">{{ libro.titulo }}</div>
+                      <div class="autor">{{ libro.autor }}</div>
+                    </div>
+
+                    <div class="meta">
+                      <span class="isbn">ISBN: {{ libro.isbn }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button
+                  mat-button
+                  matStepperNext
+                  [disabled]="step1Form.invalid"
+                >
+                  Siguiente
+                </button>
+              </div>
+            </form>
+          </mat-step>
+
+          <!-- PASO 2 -->
+          <mat-step [stepControl]="step2Form">
+            <form [formGroup]="step2Form">
+              <h3>Seleccionar Usuario</h3>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Buscar usuario</mat-label>
+                <input
+                  matInput
+                  formControlName="busquedaUsuario"
+                  placeholder="Nombre"
+                />
+              </mat-form-field>
+
+              <div class="list">
+                <div
+                  class="item"
+                  *ngFor="let usuario of usuariosFiltrados"
+                  (click)="step2Form.patchValue({ usuarioId: usuario.id })"
+                  [class.selected]="step2Form.value.usuarioId === usuario.id"
+                >
+                  <div class="item-content">
+                    <div class="info">
+                      <div class="nombre">{{ usuario.nombre }}</div>
+                    </div>
+
+                    <div class="meta">
+                      <span class="email">Email: {{ usuario.email }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button mat-button matStepperPrevious>Volver</button>
+
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="guardar()"
+                  [disabled]="step2Form.invalid"
+                >
+                  Confirmar préstamo
+                </button>
+              </div>
+            </form>
+          </mat-step>
+        </mat-horizontal-stepper>
+      </div>
+      <div class="actions">
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="volver()"
+        >
+          Volver
+        </button>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

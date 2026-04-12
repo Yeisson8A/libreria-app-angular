@@ -7,9 +7,12 @@ import { Router } from '@angular/router';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatStepperModule } from '@angular/material/stepper';
+import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { FormErrorUtil } from '../../../../core/utils/form-error.util';
+import { Libro } from '../../../../core/models/libro.model';
+import { Usuario } from '../../../../core/models/usuario.model';
 
 @Component({
   selector: 'app-prestamo-form',
@@ -20,6 +23,8 @@ import { FormErrorUtil } from '../../../../core/utils/form-error.util';
     MatButtonModule,
     MatSelectModule,
     MatCardModule,
+    MatStepperModule,
+    MatInputModule,
   ],
   templateUrl: './prestamo-form.component.html',
   styleUrl: './prestamo-form.component.scss',
@@ -32,44 +37,90 @@ export class PrestamoFormComponent implements OnInit {
   private notification = inject(NotificationService);
   private router = inject(Router);
 
-  libros: any[] = [];
-  usuarios: any[] = [];
+  libros: Libro[] = [];
+  librosFiltrados: any[] = [];
 
-  form = this.fb.nonNullable.group({
-    libroId: [null as number | null, Validators.required],
-    usuarioId: [null as number | null, Validators.required],
+  usuarios: Usuario[] = [];
+  usuariosFiltrados: any[] = [];
+
+  step1Form = this.fb.group({
+    libroId: [null, Validators.required],
+    busquedaLibro: [''],
+  });
+
+  step2Form = this.fb.group({
+    usuarioId: [null, Validators.required],
+    busquedaUsuario: [''],
   });
 
   ngOnInit() {
-    this.libroService.listar().subscribe((data) => {
-      this.libros = data.filter((l) => l.disponible);
+    this.cargarLibros();
+    this.cargarUsuarios();
+
+    // Búsqueda libros
+    this.step1Form.get('busquedaLibro')?.valueChanges.subscribe((value) => {
+      this.filtrarLibros(value!);
     });
 
-    this.usuarioService.listar().subscribe((data) => {
-      this.usuarios = data;
-    });
-
-    this.form.valueChanges.subscribe(() => {
-      FormErrorUtil.clearBackendErrors(this.form);
+    // Búsqueda usuarios
+    this.step2Form.get('busquedaUsuario')?.valueChanges.subscribe((value) => {
+      this.filtrarUsuarios(value!);
     });
   }
 
-  guardar() {
-    if (this.form.invalid) return;
+  cargarLibros() {
+    this.libroService.listar().subscribe((data) => {
+      this.libros = data.filter((l) => l.disponible);
+      this.librosFiltrados = this.libros;
+    });
+  }
 
-    const raw = this.form.getRawValue();
+  cargarUsuarios() {
+    this.usuarioService.listar().subscribe((data) => {
+      this.usuarios = data;
+      this.usuariosFiltrados = data;
+    });
+  }
+
+  filtrarLibros(valor: string) {
+    if (!valor) {
+      this.librosFiltrados = this.libros;
+      return;
+    }
+
+    const filtro = valor.toLowerCase();
+
+    this.librosFiltrados = this.libros.filter(
+      (l) =>
+        l.titulo.toLowerCase().includes(filtro) ||
+        l.isbn.toLowerCase().includes(filtro),
+    );
+  }
+
+  filtrarUsuarios(valor: string) {
+    if (!valor) {
+      this.usuariosFiltrados = this.usuarios;
+      return;
+    }
+
+    const filtro = valor.toLowerCase();
+
+    this.usuariosFiltrados = this.usuarios.filter((u) =>
+      u.nombre.toLowerCase().includes(filtro),
+    );
+  }
+
+  guardar() {
+    if (this.step1Form.invalid || this.step2Form.invalid) return;
 
     const data = {
-      libroId: raw.libroId!,
-      usuarioId: raw.usuarioId!
+      libroId: this.step1Form.value.libroId!,
+      usuarioId: this.step2Form.value.usuarioId!,
     };
 
-    this.prestamoService.prestar(data).subscribe({
-      next: () => {
-        this.notification.showMessage('Libro prestado correctamente');
-        this.router.navigate(['/prestamos']);
-      },
-      error: (err) => FormErrorUtil.applyBackendErrors(this.form, err),
+    this.prestamoService.prestar(data).subscribe(() => {
+      this.notification.showMessage('Libro prestado correctamente');
+      this.router.navigate(['/prestamos']);
     });
   }
 

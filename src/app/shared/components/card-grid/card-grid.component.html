@@ -1,0 +1,60 @@
+<div class="grid">
+  @for (item of items; track $index) {
+    <mat-card class="card">
+      <mat-card-content>
+        <div class="content">
+          <div class="info">
+            <h3>{{ item[titleKey] }}</h3>
+            <p class="subtitle">{{ item[subtitleKey] }}</p>
+
+            @if (extraKey) {
+              <p class="extra">
+                {{ item[extraKey!] }}
+              </p>
+            }
+          </div>
+
+          <div class="actions">
+            @if (showEdit) {
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="edit.emit(item)"
+                matTooltip="Editar"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+            }
+
+            @if (showDelete) {
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="delete.emit(item)"
+                matTooltip="Eliminar"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+
+            <!-- Acciones dinámicas -->
+            @if (customActions) {
+              <ng-container>
+                @for (action of customActions(item); track action) {
+                  <button
+                    mat-icon-button
+                    [color]="action.color || 'primary'"
+                    (click)="action.action(item)"
+                    [matTooltip]="action.tooltip"
+                  >
+                    <mat-icon>{{ action.icon }}</mat-icon>
+                  </button>
+                }
+              </ng-container>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

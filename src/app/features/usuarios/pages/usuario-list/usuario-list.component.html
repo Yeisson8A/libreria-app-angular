@@ -6,21 +6,11 @@
     Nuevo Usuario
   </button>
 </div>
-
-<table>
-  <thead>
-    <tr>
-      <th>Nombre</th>
-      <th>Email</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    @for (usuario of usuarios; track $index) {
-      <tr>
-        <td>{{ usuario.nombre }}</td>
-        <td>{{ usuario.email }}</td>
-      </tr>
-    }
-  </tbody>
-</table>
+<br/>
+<app-card-grid
+  [items]="usuarios"
+  titleKey="nombre"
+  subtitleKey="email"
+  [showEdit]="false"
+  [showDelete]="false">
+</app-card-grid>

@@ -1,0 +1,43 @@
+<div class="header">
+  <h2>Préstamos</h2>
+
+  <button mat-raised-button color="primary" (click)="irCrear()">
+    <mat-icon>add</mat-icon>
+    Nuevo Préstamo
+  </button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Libro</th>
+      <th>Usuario</th>
+      <th>Fecha Préstamo</th>
+      <th>Fecha Devolución</th>
+      <th>Estado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for (p of prestamos; track $index) {
+      <tr>
+        <td>{{ p.tituloLibro }}</td>
+        <td>{{ p.nombreUsuario }}</td>
+        <td>{{ p.fechaPrestamo | date }}</td>
+        <td>{{ p.fechaDevolucion ? (p.fechaDevolucion | date) : "-" }}</td>
+        <td>
+          {{ p.fechaDevolucion ? "Devuelto" : "Prestado" }}
+        </td>
+
+        <td>
+          @if (!p.fechaDevolucion) {
+            <button mat-button color="primary" (click)="devolver(p)" matTooltip="Devolver">
+              <mat-icon>assignment_return</mat-icon>
+            </button>
+          }
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

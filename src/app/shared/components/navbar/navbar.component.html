@@ -1,0 +1,26 @@
+<mat-toolbar color="primary" class="toolbar">
+
+  <!-- Logo / título -->
+  <span class="logo" (click)="navegar('')">
+    Librería
+  </span>
+
+  <span class="spacer"></span>
+
+  <!-- Navegación -->
+  <button mat-button (click)="navegar('/libros')">
+    <mat-icon>menu_book</mat-icon>
+    Libros
+  </button>
+
+  <button mat-button (click)="navegar('/usuarios')">
+    <mat-icon>people</mat-icon>
+    Usuarios
+  </button>
+
+  <button mat-button (click)="navegar('/prestamos')">
+    <mat-icon>swap_horiz</mat-icon>
+    Préstamos
+  </button>
+
+</mat-toolbar>

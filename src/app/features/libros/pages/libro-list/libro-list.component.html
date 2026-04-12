@@ -1,0 +1,42 @@
+<div class="header">
+  <h2>Libros</h2>
+
+  <button mat-raised-button color="primary" (click)="irCrear()">
+    <mat-icon>add</mat-icon>
+    Nuevo Libro
+  </button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Título</th>
+      <th>Autor</th>
+      <th>ISBN</th>
+      <th>Disponible</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for (libro of libros; track $index) {
+      <tr>
+        <td>{{ libro.titulo }}</td>
+        <td>{{ libro.autor }}</td>
+        <td>{{ libro.isbn }}</td>
+        <td>{{ libro.disponible ? "Sí" : "No" }}</td>
+
+        <td>
+          <!-- Editar -->
+          <button mat-icon-button color="primary" (click)="irEditar(libro.id)" matTooltip="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <!-- Eliminar -->
+          <button mat-icon-button color="warn" (click)="eliminar(libro)" matTooltip="Eliminar">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

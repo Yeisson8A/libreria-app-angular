@@ -1,0 +1,95 @@
+<div class="container">
+  <mat-card>
+    <mat-card-title>
+      {{ id ? "Editar Libro" : "Nuevo Libro" }}
+    </mat-card-title>
+    <br />
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="guardar()" class="form">
+        <div class="row">
+          <mat-form-field appearance="outline">
+            <mat-label>Título</mat-label>
+            <input matInput formControlName="titulo" />
+            <mat-error *ngIf="form.get('titulo')?.hasError('required')">
+              El título es obligatorio
+            </mat-error>
+            <mat-error *ngIf="form.get('titulo')?.hasError('backend')">
+              {{ form.get("titulo")?.getError("backend") }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Autor</mat-label>
+            <input matInput formControlName="autor" />
+            <mat-error *ngIf="form.get('autor')?.hasError('required')">
+              El autor es obligatorio
+            </mat-error>
+            <mat-error *ngIf="form.get('autor')?.hasError('backend')">
+              {{ form.get("autor")?.getError("backend") }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="row">
+          <mat-form-field appearance="outline">
+            <mat-label>ISBN</mat-label>
+            <input matInput formControlName="isbn" />
+            <mat-error *ngIf="form.get('isbn')?.hasError('required')">
+              El ISBN es obligatorio
+            </mat-error>
+            <mat-error *ngIf="form.get('isbn')?.hasError('backend')">
+              {{ form.get("isbn")?.getError("backend") }}
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Fecha Publicación</mat-label>
+            <input
+              matInput
+              [matDatepicker]="picker"
+              formControlName="fechaPublicacion"
+              [readonly]="true"
+              [max]="maxDate"
+            />
+            <mat-hint>MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error
+              *ngIf="form.get('fechaPublicacion')?.hasError('required')"
+            >
+              La fecha es obligatoria
+            </mat-error>
+            <mat-error
+              *ngIf="form.get('fechaPublicacion')?.hasError('backend')"
+            >
+              {{ form.get("fechaPublicacion")?.getError("backend") }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="actions">
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="volver()"
+          >
+            Volver
+          </button>
+
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid"
+          >
+            Guardar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

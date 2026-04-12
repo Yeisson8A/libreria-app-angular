@@ -1,0 +1,26 @@
+<div class="header">
+  <h2>Usuarios</h2>
+
+  <button mat-raised-button color="primary" (click)="irCrear()">
+    <mat-icon>add</mat-icon>
+    Nuevo Usuario
+  </button>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Email</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    @for (usuario of usuarios; track $index) {
+      <tr>
+        <td>{{ usuario.nombre }}</td>
+        <td>{{ usuario.email }}</td>
+      </tr>
+    }
+  </tbody>
+</table>

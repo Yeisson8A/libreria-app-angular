@@ -6,12 +6,28 @@
     Nuevo Libro
   </button>
 </div>
-<br/>
+<br />
 <app-card-grid
   [items]="libros"
   titleKey="titulo"
   subtitleKey="autor"
   extraKey="isbn"
   (edit)="editar($event)"
-  (delete)="eliminar($event)">
+  (delete)="eliminar($event)"
+>
+  <!-- TEMPLATE PERSONALIZADO -->
+  <ng-template #extraTemplate let-libro>
+    <div class="extra-info">
+      <p>
+        Fecha publicación:
+        {{ libro.fechaPublicacion | date: "shortDate" }}
+      </p>
+
+      @if (libro.disponible) {
+        <p class="disponible">Disponible</p>
+      } @else {
+        <p class="prestado">No Disponible</p>
+      }
+    </div>
+  </ng-template>
 </app-card-grid>

@@ -6,12 +6,31 @@
     Nuevo Préstamo
   </button>
 </div>
-<br/>
+<br />
 <app-card-grid
   [items]="prestamos"
   titleKey="tituloLibro"
   subtitleKey="nombreUsuario"
   [showEdit]="false"
   [showDelete]="false"
-  [customActions]="accionesPrestamo">
+  [customActions]="accionesPrestamo"
+>
+  <!-- TEMPLATE PERSONALIZADO -->
+  <ng-template #extraTemplate let-prestamo>
+    <div class="extra-info">
+      <p>
+        Préstamo:
+        {{ prestamo.fechaPrestamo | date: "shortDate" }}
+      </p>
+
+      @if (prestamo.fechaDevolucion) {
+        <p class="devuelto">
+          Devuelto:
+          {{ prestamo.fechaDevolucion | date: "shortDate" }}
+        </p>
+      } @else {
+        <p class="pendiente">Pendiente de devolución</p>
+      }
+    </div>
+  </ng-template>
 </app-card-grid>

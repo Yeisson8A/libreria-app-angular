@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  libreria-app-angular:
+    build: .
+    container_name: libreria-app-angular
+    ports:
+      - "4200:80"
+    networks:
+      - libreria-network
+
+networks:
+  libreria-network:
+    external: true

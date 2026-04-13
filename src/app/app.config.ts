@@ -7,6 +7,17 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+
+export function customPaginator() {
+  const paginator = new MatPaginatorIntl();
+
+  paginator.itemsPerPageLabel = 'Items por página';
+  paginator.nextPageLabel = 'Siguiente';
+  paginator.previousPageLabel = 'Anterior';
+
+  return paginator;
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -16,5 +27,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([loadingInterceptor, errorInterceptor])),
     provideNativeDateAdapter(),
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    { provide: MatPaginatorIntl, useFactory: customPaginator },
   ],
 };

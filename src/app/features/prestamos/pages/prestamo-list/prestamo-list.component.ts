@@ -37,20 +37,19 @@ export class PrestamoListComponent implements OnInit {
     this.router.navigate(['/prestamos/nuevo']);
   }
 
-  accionesPrestamo(prestamo: any) {
-    const actions = [];
+  accionesPrestamo = (prestamo: any) => {
+    if (prestamo.fechaDevolucion) return [];
 
-    if (!prestamo.fechaDevolucion) {
-      actions.push({
+    return [
+      {
+        id: 'devolver',
         icon: 'assignment_return',
-        tooltip: 'Devolver',
+        tooltip: 'Devolver libro',
         color: 'primary',
         action: (p: any) => this.devolver(p),
-      });
-    }
-
-    return actions;
-  }
+      },
+    ];
+  };
 
   devolver(prestamo: Prestamo) {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {

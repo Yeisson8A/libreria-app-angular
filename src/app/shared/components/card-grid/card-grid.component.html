@@ -1,5 +1,5 @@
 <div class="grid">
-  @for (item of items; track $index) {
+  @for (item of itemsWithActions(); track item) {
     <mat-card class="card">
       <mat-card-content>
         <div class="content">
@@ -8,17 +8,23 @@
             <p class="subtitle">{{ item[subtitleKey] }}</p>
 
             @if (extraKey) {
-              <p class="extra">
-                {{ item[extraKey!] }}
-              </p>
+              <p class="extra">{{ item[extraKey!] }}</p>
+            }
+
+            <!-- SLOT DINÁMICO -->
+            @if (extraTemplate) {
+              <ng-container
+                *ngTemplateOutlet="extraTemplate; context: { $implicit: item }"
+              >
+              </ng-container>
             }
           </div>
 
           <div class="actions">
+            <!-- default -->
             @if (showEdit) {
               <button
                 mat-icon-button
-                color="primary"
                 (click)="edit.emit(item)"
                 matTooltip="Editar"
               >
@@ -37,20 +43,16 @@
               </button>
             }
 
-            <!-- Acciones dinámicas -->
-            @if (customActions) {
-              <ng-container>
-                @for (action of customActions(item); track action) {
-                  <button
-                    mat-icon-button
-                    [color]="action.color || 'primary'"
-                    (click)="action.action(item)"
-                    [matTooltip]="action.tooltip"
-                  >
-                    <mat-icon>{{ action.icon }}</mat-icon>
-                  </button>
-                }
-              </ng-container>
+            <!-- custom actions -->
+            @for (action of item.actions; track action.id || action.icon) {
+              <button
+                mat-icon-button
+                [color]="action.color ?? 'primary'"
+                (click)="action.action(item)"
+                [matTooltip]="action.tooltip"
+              >
+                <mat-icon>{{ action.icon }}</mat-icon>
+              </button>
             }
           </div>
         </div>
@@ -58,3 +60,24 @@
     </mat-card>
   }
 </div>
+
+<!-- BOTÓN CARGAR MÁS -->
+@if (visibleCount() < totalItems()) {
+  <div class="load-more-container">
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="loadMore()"
+      [disabled]="loading()"
+    >
+      @if (!loading()) {
+        Cargar más
+      } @else {
+        <span class="btn-loading">
+          <mat-spinner diameter="20"></mat-spinner>
+          Cargando...
+        </span>
+      }
+    </button>
+  </div>
+}

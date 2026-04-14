@@ -4,10 +4,9 @@ import { Libro } from '../models/libro.model';
 import { CrearLibroRequest } from '../models/crear-libro-request.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LibroService {
-
   private api = inject(ApiService);
   private endpoint = 'libros';
 
@@ -29,5 +28,11 @@ export class LibroService {
 
   eliminar(id: number) {
     return this.api.delete<void>(`${this.endpoint}/${id}`);
+  }
+
+  buscar(query: string) {
+    return this.api.get<Libro[]>(`${this.endpoint}/buscar`, {
+      query,
+    });
   }
 }

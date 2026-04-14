@@ -13,6 +13,8 @@ import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { Libro } from '../../../../core/models/libro.model';
 import { Usuario } from '../../../../core/models/usuario.model';
+import { debounceTime, distinctUntilChanged, switchMap, filter, tap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
   selector: 'app-prestamo-form',
@@ -43,71 +45,68 @@ export class PrestamoFormComponent implements OnInit {
   usuarios: Usuario[] = [];
   usuariosFiltrados: any[] = [];
 
-  step1Form = this.fb.group({
-    libroId: [null, Validators.required],
+  loadingLibros = false;
+  loadingUsuarios = false;
+
+  step1Form = this.fb.nonNullable.group({
+    libroId: [null as number | null, Validators.required],
     busquedaLibro: [''],
   });
 
-  step2Form = this.fb.group({
-    usuarioId: [null, Validators.required],
+  step2Form = this.fb.nonNullable.group({
+    usuarioId: [null as number | null, Validators.required],
     busquedaUsuario: [''],
   });
 
   ngOnInit() {
-    this.cargarLibros();
-    this.cargarUsuarios();
-
-    // Búsqueda libros
-    this.step1Form.get('busquedaLibro')?.valueChanges.subscribe((value) => {
-      this.filtrarLibros(value!);
-    });
-
-    // Búsqueda usuarios
-    this.step2Form.get('busquedaUsuario')?.valueChanges.subscribe((value) => {
-      this.filtrarUsuarios(value!);
-    });
+    this.initBusquedaLibros();
+    this.initBusquedaUsuarios();
   }
 
-  cargarLibros() {
-    this.libroService.listar().subscribe((data) => {
-      this.libros = data.filter((l) => l.disponible);
-      this.librosFiltrados = this.libros;
-    });
+  // LIBROS
+  initBusquedaLibros() {
+    this.step1Form.get('busquedaLibro')?.valueChanges
+      .pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        tap(() => {
+          this.loadingLibros = true;
+          this.librosFiltrados = [];
+        }),
+        filter((query) => !!query && query.length >= 2),
+        switchMap((query) =>
+          this.libroService.buscar(query!).pipe(
+            catchError(() => of([]))
+          )
+        )
+      )
+      .subscribe((libros) => {
+        this.librosFiltrados = libros.filter((l) => l.disponible);
+        this.loadingLibros = false;
+      });
   }
 
-  cargarUsuarios() {
-    this.usuarioService.listar().subscribe((data) => {
-      this.usuarios = data;
-      this.usuariosFiltrados = data;
-    });
-  }
-
-  filtrarLibros(valor: string) {
-    if (!valor) {
-      this.librosFiltrados = this.libros;
-      return;
-    }
-
-    const filtro = valor.toLowerCase();
-
-    this.librosFiltrados = this.libros.filter(
-      (l) =>
-        l.titulo.toLowerCase().includes(filtro) ||
-        l.isbn.toLowerCase().includes(filtro),
-    );
-  }
-
-  filtrarUsuarios(valor: string) {
-    if (!valor) {
-      this.usuariosFiltrados = this.usuarios;
-      return;
-    }
-
-    const filtro = valor.toLowerCase();
-
-    this.usuariosFiltrados = this.usuarios.filter((u) =>
-      u.nombre.toLowerCase().includes(filtro),
-    );
+  // USUARIOS
+  initBusquedaUsuarios() {
+    this.step2Form.get('busquedaUsuario')?.valueChanges
+      .pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        tap(() => {
+          this.loadingUsuarios = true;
+          this.usuariosFiltrados = [];
+        }),
+        filter((query) => !!query && query.length >= 2),
+        switchMap((query) =>
+          this.usuarioService.buscar(query!).pipe(
+            catchError(() => of([]))
+          )
+        )
+      )
+      .subscribe((usuarios) => {
+        this.usuariosFiltrados = usuarios;
+        this.loadingUsuarios = false;
+      });
   }
 
   guardar() {

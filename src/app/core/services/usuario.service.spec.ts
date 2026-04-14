@@ -76,4 +76,47 @@ describe('UsuarioService', () => {
 
     expect(apiService.post).toHaveBeenCalledWith('usuarios', request);
   });
+
+  it('deberia llamar ApiService.get con endpoint y query', () => {
+    apiService.get.and.returnValue(of([]));
+
+    service.buscar('juan').subscribe();
+
+    expect(apiService.get).toHaveBeenCalledWith('usuarios/buscar', {
+      query: 'juan',
+    });
+  });
+
+  it('deberia retornar lista de usuarios', (done) => {
+    const mockUsuarios: Usuario[] = [
+      { id: 1, nombre: 'Juan', email: 'juan@test.com' },
+    ];
+
+    apiService.get.and.returnValue(of(mockUsuarios));
+
+    service.buscar('juan').subscribe((result) => {
+      expect(result).toEqual(mockUsuarios);
+      done();
+    });
+  });
+
+  it('deberia enviar query vacia correctamente', () => {
+    apiService.get.and.returnValue(of([]));
+
+    service.buscar('').subscribe();
+
+    expect(apiService.get).toHaveBeenCalledWith('usuarios/buscar', {
+      query: '',
+    });
+  });
+
+  it('deberia enviar query null si se pasa null', () => {
+    apiService.get.and.returnValue(of([]));
+
+    service.buscar(null as any).subscribe();
+
+    expect(apiService.get).toHaveBeenCalledWith('usuarios/buscar', {
+      query: null,
+    });
+  });
 });

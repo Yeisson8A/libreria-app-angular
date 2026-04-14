@@ -5,10 +5,9 @@ import { CrearUsuarioRequest } from '../models/crear-usuario-request.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsuarioService {
-
   private api = inject(ApiService);
   private endpoint = 'usuarios';
 
@@ -25,5 +24,12 @@ export class UsuarioService {
   // Crear usuario
   crear(data: CrearUsuarioRequest): Observable<Usuario> {
     return this.api.post<Usuario>(this.endpoint, data);
+  }
+
+  // Buscar
+  buscar(query: string) {
+    return this.api.get<Usuario[]>(`${this.endpoint}/buscar`, {
+      query,
+    });
   }
 }

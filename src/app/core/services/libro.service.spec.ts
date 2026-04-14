@@ -123,4 +123,55 @@ describe('LibroService', () => {
 
     expect(apiService.delete).toHaveBeenCalledWith('libros/1');
   });
+
+  it('deberia llamar ApiService.get con endpoint y query', () => {
+    const mockLibros: Libro[] = [];
+    apiService.get.and.returnValue(of(mockLibros));
+
+    service.buscar('clean').subscribe();
+
+    expect(apiService.get).toHaveBeenCalledWith('libros/buscar', {
+      query: 'clean',
+    });
+  });
+
+  it('deberia retornar lista de libros', (done) => {
+    const mockLibros: Libro[] = [
+      {
+        id: 1,
+        titulo: 'Clean Code',
+        autor: 'Martin',
+        isbn: '123',
+        fechaPublicacion: '2025-04-14',
+        disponible: true,
+      },
+    ];
+
+    apiService.get.and.returnValue(of(mockLibros));
+
+    service.buscar('clean').subscribe((result) => {
+      expect(result).toEqual(mockLibros);
+      done();
+    });
+  });
+
+  it('deberia enviar query vacia correctamente', () => {
+    apiService.get.and.returnValue(of([]));
+
+    service.buscar('').subscribe();
+
+    expect(apiService.get).toHaveBeenCalledWith('libros/buscar', {
+      query: '',
+    });
+  });
+
+  it('deberia enviar query null si se pasa null', () => {
+    apiService.get.and.returnValue(of([]));
+
+    service.buscar(null as any).subscribe();
+
+    expect(apiService.get).toHaveBeenCalledWith('libros/buscar', {
+      query: null,
+    });
+  });
 });
